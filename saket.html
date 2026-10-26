@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#174b45" />
+  <meta name="description" content="Noteroom — practice handwriting, earn coins, and build your dream classroom." />
+  <title>Noteroom — Your Classroom Adventure</title>
+  <style>
+    :root {
+      --ink: #183f3a;
+      --ink-soft: #4b6b65;
+      --cream: #fffaf0;
+      --paper: #fffdf7;
+      --green: #277d5d;
+      --green-dark: #185941;
+      --mint: #d7f0d9;
+      --yellow: #ffd76b;
+      --yellow-dark: #d9a82e;
+      --coral: #ff957c;
+      --lilac: #c7b4ff;
+      --blue: #9bd7ed;
+      --shadow: 0 16px 0 rgba(27, 70, 59, .16), 0 28px 55px rgba(20, 54, 47, .24);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-width: 320px; min-height: 100%; margin: 0; }
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+      background: #c9e9d1;
+    }
+    button, input, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 4px solid #f7bd3f;
+      outline-offset: 4px;
+    }
+
+    .scene {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      min-height: 100svh;
+      overflow: hidden;
+      background-image:
+        linear-gradient(180deg, rgba(22, 54, 48, .18) 0%, rgba(22, 54, 48, .02) 35%, rgba(15, 52, 43, .38) 100%),
+        linear-gradient(90deg, rgba(255, 248, 221, .34), rgba(255, 250, 235, .09) 50%, rgba(255, 248, 221, .16)),
+        url("https://res.cloudinary.com/dol86wsz1/image/upload/c_limit%2Cw_1600%2Cf_auto%2Cq_auto%3Agood/v1789950299/summer_art/img-9383361f-711f-4799-8d48-7bbf15eec500-1789950298594-0_1789950298595_4vvlvi1o.png");
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(247, 244, 221, .10), rgba(25, 72, 57, .13));
+      pointer-events: none;
+    }
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 13vh;
+      min-height: 70px;
+      z-index: -1;
+      background: linear-gradient(0deg, rgba(27, 69, 48, .23), transparent);
+      pointer-events: none;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: clamp(16px, 3vw, 28px) clamp(16px, 4vw, 48px);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      padding: 8px 13px 8px 8px;
+      border: 2px solid rgba(255,255,255,.82);
+      border-radius: 18px;
+      background: rgba(255, 252, 239, .86);
+      box-shadow: 0 5px 0 rgba(24, 63, 58, .12);
+      color: var(--ink);
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+    .brand-mark {
+      display: grid;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      border: 2px solid #fff;
+      border-radius: 12px;
+      background: var(--yellow);
+      box-shadow: 0 3px 0 var(--yellow-dark);
+      font-size: 24px;
+      transform: rotate(-5deg);
+    }
+    .brand-name { font-weight: 1000; font-size: 16px; letter-spacing: -.04em; }
+    .brand-small { display: block; margin-top: 1px; color: #6d8a7f; font-size: 9px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+
+    .login-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 0 20px;
+      border: 2px solid rgba(255,255,255,.92);
+      border-radius: 16px;
+      background: rgba(255, 253, 245, .94);
+      color: var(--ink);
+      box-shadow: 0 5px 0 rgba(24, 63, 58, .15);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .login-button:hover { transform: translateY(-2px); box-shadow: 0 7px 0 rgba(24, 63, 58, .15); }
+    .login-button:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(24, 63, 58, .15); }
+
+    .main-area {
+      display: grid;
+      flex: 1;
+      place-items: center;
+      padding: 14px 18px 46px;
+    }
+    .menu-card {
+      position: relative;
+      width: min(480px, 100%);
+      padding: clamp(25px, 5vw, 39px) clamp(22px, 5vw, 44px) 29px;
+      border: 3px solid rgba(255,255,255,.95);
+      border-radius: 34px;
+      background: linear-gradient(155deg, rgba(255, 254, 247, .96), rgba(245, 255, 239, .91));
+      box-shadow: var(--shadow);
+      text-align: center;
+      backdrop-filter: blur(15px);
+      animation: card-enter .65s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .card-sparkle {
+      position: absolute;
+      top: -21px;
+      right: 28px;
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 3px solid white;
+      border-radius: 16px;
+      background: var(--coral);
+      box-shadow: 0 5px 0 #d66f5d;
+      font-size: 24px;
+      transform: rotate(9deg);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 13px;
+      padding: 7px 12px;
+      border: 1px solid #d7ead2;
+      border-radius: 999px;
+      background: #eff8e9;
+      color: #4b8564;
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      color: #1e5948;
+      font-size: clamp(47px, 9vw, 72px);
+      font-weight: 1000;
+      letter-spacing: -.075em;
+      line-height: .88;
+      text-shadow: 0 3px 0 #fff, 0 6px 0 rgba(39, 125, 93, .09);
+    }
+    h1 .note { color: #e69b2d; }
+    h1 .room { color: #317f61; }
+    .title-line {
+      width: 70px;
+      height: 6px;
+      margin: 21px auto 14px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--coral), var(--yellow), #88d6a3);
+    }
+    .tagline {
+      max-width: 300px;
+      margin: 0 auto 25px;
+      color: var(--ink-soft);
+      font-size: clamp(13px, 2.8vw, 15px);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .menu-buttons { display: grid; gap: 13px; width: 100%; max-width: 310px; margin: 0 auto; }
+    .game-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      width: 100%;
+      min-height: 62px;
+      padding: 9px 19px;
+      border: 3px solid rgba(255,255,255,.96);
+      border-radius: 19px;
+      color: white;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 6px 0 var(--button-shadow), 0 10px 18px rgba(24, 63, 58, .10);
+      transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+    }
+    .game-button:hover { transform: translateY(-3px); filter: saturate(1.08) brightness(1.02); box-shadow: 0 9px 0 var(--button-shadow), 0 13px 20px rgba(24, 63, 58, .13); }
+    .game-button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--button-shadow); }
+    .game-button .button-icon {
+      display: grid;
+      flex: 0 0 39px;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      border: 2px solid rgba(255,255,255,.65);
+      border-radius: 13px;
+      background: rgba(255,255,255,.2);
+      font-size: 21px;
+    }
+    .button-copy { display: block; flex: 1; }
+    .button-title { display: block; font-size: 14px; font-weight: 1000; letter-spacing: .11em; }
+    .button-caption { display: block; margin-top: 3px; color: rgba(255,255,255,.85); font-size: 10px; font-weight: 800; letter-spacing: .025em; }
+    .button-arrow { margin-left: auto; font-size: 22px; font-weight: 900; opacity: .9; }
+    .play { --button-shadow: #18563f; background: linear-gradient(180deg, #42a779, #27845d); }
+    .achievements { --button-shadow: #6e54b1; background: linear-gradient(180deg, #a18ae8, #8066cb); }
+    .settings { --button-shadow: #357f9a; background: linear-gradient(180deg, #4daec5, #288eaa); }
+    .small-print { margin: 24px 0 0; color: #6d8b79; font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+
+    .bottom-note {
+      display: flex;
+      justify-content: center;
+      gap: clamp(10px, 3vw, 25px);
+      flex-wrap: wrap;
+      padding: 0 16px 22px;
+      color: white;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-align: center;
+      text-shadow: 0 2px 5px rgba(10, 40, 28, .52);
+      text-transform: uppercase;
+    }
+    .bottom-note span { display: inline-flex; align-items: center; gap: 7px; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(16, 48, 42, .58);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease, visibility .2s ease;
+    }
+    .overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+    .dialog {
+      position: relative;
+      width: min(510px, 100%);
+      max-height: min(82vh, 760px);
+      overflow: auto;
+      padding: clamp(22px, 5vw, 34px);
+      border: 3px solid white;
+      border-radius: 29px;
+      background: var(--paper);
+      box-shadow: 0 13px 0 rgba(12, 49, 38, .26), 0 25px 70px rgba(6, 35, 29, .3);
+      transform: translateY(12px) scale(.98);
+      transition: transform .2s ease;
+    }
+    .overlay.open .dialog { transform: translateY(0) scale(1); }
+    .close-button {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 2px solid #e3eadd;
+      border-radius: 12px;
+      background: #f4f7e9;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .dialog-kicker { margin: 0 0 7px; color: #6a9a75; font-size: 10px; font-weight: 1000; letter-spacing: .16em; text-transform: uppercase; }
+    .dialog h2 { max-width: calc(100% - 35px); margin: 0 0 10px; color: var(--ink); font-size: clamp(25px, 5vw, 34px); letter-spacing: -.045em; line-height: 1.08; }
+    .dialog-intro { margin: 0 0 21px; color: #638077; font-size: 13px; line-height: 1.6; }
+    .choice-grid { display: grid; gap: 11px; }
+    .choice-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      width: 100%;
+      padding: 13px;
+      border: 2px solid #e0ecdc;
+      border-radius: 17px;
+      background: #f8fbf3;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color .15s ease, transform .15s ease, background .15s ease;
+    }
+    .choice-card:hover { transform: translateY(-2px); border-color: #a6d3ae; background: #f0f8e9; }
+    .choice-emoji { display: grid; flex: 0 0 47px; width: 47px; height: 47px; place-items: center; border-radius: 14px; background: #ffeeb6; font-size: 25px; }
+    .choice-card:nth-child(2) .choice-emoji { background: #e9e0ff; }
+    .choice-card:nth-child(3) .choice-emoji { background: #d9f0e1; }
+    .choice-card strong { display: block; font-size: 13px; }
+    .choice-card small { display: block; margin-top: 4px; color: #6c897c; font-size: 11px; line-height: 1.35; }
+    .choice-arrow { margin-left: auto; color: #79a48a; font-size: 22px; }
+    .status-note { margin: 14px 0 0; padding: 11px 12px; border-radius: 13px; background: #fff2cd; color: #74591b; font-size: 11px; line-height: 1.5; }
+
+    .achievement-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .achievement {
+      padding: 14px 8px 13px;
+      border: 2px solid #ebe5ff;
+      border-radius: 17px;
+      background: #f8f5ff;
+      text-align: center;
+    }
+    .achievement-icon { display: grid; width: 53px; height: 53px; margin: 0 auto 9px; place-items: center; border: 2px solid #fff; border-radius: 17px; background: #e5dcff; font-size: 27px; }
+    .achievement strong { display: block; color: #4c417c; font-size: 11px; }
+    .achievement small { display: block; margin-top: 5px; color: #8377a6; font-size: 10px; line-height: 1.35; }
+    .demo-label { display: inline-block; margin-bottom: 15px; padding: 6px 9px; border-radius: 999px; background: #eaf4e5; color: #5b8b68; font-size: 9px; font-weight: 1000; letter-spacing: .12em; text-transform: uppercase; }
+
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid #e8eee1; }
+    .setting-row:last-of-type { border-bottom: 0; }
+    .setting-copy strong { display: block; font-size: 13px; }
+    .setting-copy small { display: block; margin-top: 4px; color: #718b7f; font-size: 11px; }
+    .switch { position: relative; display: inline-flex; flex: 0 0 54px; align-items: center; width: 54px; height: 31px; padding: 3px; border: 0; border-radius: 99px; background: #c5d2c7; cursor: pointer; transition: background .18s ease; }
+    .switch::after { content: ""; width: 25px; height: 25px; border-radius: 50%; background: white; box-shadow: 0 2px 4px rgba(0,0,0,.15); transition: transform .18s ease; }
+    .switch[aria-checked="true"] { background: #369768; }
+    .switch[aria-checked="true"]::after { transform: translateX(23px); }
+
+    .login-form { display: grid; gap: 13px; }
+    .field-label { display: block; margin-bottom: 6px; color: #536f64; font-size: 11px; font-weight: 900; }
+    .login-form input, .login-form select { width: 100%; min-height: 46px; padding: 11px 13px; border: 2px solid #dbe8d8; border-radius: 13px; background: white; color: var(--ink); }
+    .login-form input::placeholder { color: #94a69b; }
+    .primary-dialog-button { width: 100%; min-height: 48px; padding: 12px 16px; border: 0; border-radius: 14px; background: linear-gradient(180deg, #45a877, #277d5d); color: white; box-shadow: 0 4px 0 #185941; cursor: pointer; font-size: 12px; font-weight: 1000; letter-spacing: .08em; text-transform: uppercase; }
+    .primary-dialog-button:active { transform: translateY(3px); box-shadow: 0 1px 0 #185941; }
+    .form-note { margin: 2px 0 0; color: #829388; font-size: 10px; line-height: 1.5; }
+    .toast {
+      position: fixed;
+      z-index: 40;
+      right: 18px;
+      bottom: 18px;
+      max-width: min(380px, calc(100vw - 36px));
+      padding: 13px 17px;
+      border: 2px solid white;
+      border-radius: 15px;
+      background: #1c5442;
+      color: white;
+      box-shadow: 0 8px 25px rgba(9, 40, 29, .3);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .no-motion *, .no-motion *::before, .no-motion *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+
+    @keyframes card-enter { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @media (min-width: 900px) and (min-height: 700px) {
+      .menu-card { transform: translateY(-8px); }
+    }
+    @media (max-width: 520px) {
+      .topbar { padding: 14px 13px; }
+      .brand { gap: 8px; padding: 6px 10px 6px 6px; }
+      .brand-mark { width: 34px; height: 34px; font-size: 21px; }
+      .brand-name { font-size: 14px; }
+      .brand-small { font-size: 8px; }
+      .login-button { min-height: 41px; padding: 0 12px; gap: 6px; font-size: 10px; }
+      .main-area { padding: 25px 14px 30px; }
+      .menu-card { border-radius: 28px; }
+      .game-button { min-height: 58px; }
+      .bottom-note { padding-bottom: 16px; font-size: 8px; gap: 9px 14px; }
+      .achievement-grid { gap: 6px; }
+      .achievement { padding-left: 4px; padding-right: 4px; }
+      .achievement-icon { width: 43px; height: 43px; font-size: 22px; }
+      .achievement strong { font-size: 10px; }
+      .achievement small { font-size: 9px; }
+    }
+    @media (max-height: 650px) and (min-width: 521px) {
+      .topbar { padding-top: 12px; padding-bottom: 8px; }
+      .main-area { padding-top: 8px; padding-bottom: 14px; }
+      .menu-card { padding-top: 22px; padding-bottom: 20px; }
+      h1 { font-size: 52px; }
+      .tagline { margin-bottom: 14px; }
+      .menu-buttons { gap: 9px; }
+      .game-button { min-height: 53px; }
+      .small-print { margin-top: 14px; }
+      .bottom-note { padding-bottom: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Noteroom home">
+        <span class="brand-mark" aria-hidden="true">✎</span>
+        <span><span class="brand-name">noteroom</span><span class="brand-small">practice • play • decorate</span></span>
+      </a>
+      <button class="login-button" id="loginButton" type="button"><span aria-hidden="true">♙</span> Log in <span aria-hidden="true">↗</span></button>
+    </header>
+
+    <main class="main-area" id="home">
+      <section class="menu-card" aria-labelledby="gameTitle">
+        <span class="card-sparkle" aria-hidden="true">✦</span>
+        <p class="eyebrow"><span aria-hidden="true">✧</span> Your classroom adventure <span aria-hidden="true">✧</span></p>
+        <h1 id="gameTitle"><span class="note">note</span><span class="room">room</span></h1>
+        <div class="title-line" aria-hidden="true"></div>
+        <p class="tagline">Write a little. Earn coins. Build a room that feels like yours.</p>
+
+        <nav class="menu-buttons" aria-label="Main menu">
+          <button class="game-button play" id="playButton" type="button">
+            <span class="button-icon" aria-hidden="true">▶</span>
+            <span class="button-copy"><span class="button-title">PLAY</span><span class="button-caption">Start your next mission</span></span>
+            <span class="button-arrow" aria-hidden="true">›</span>
+          </button>
+          <button class="game-button achievements" id="achievementsButton" type="button">
+            <span class="button-icon" aria-hidden="true">🏆</span>
+            <span class="button-copy"><span class="button-title">ACHIEVEMENTS</span><span class="button-caption">See what you have unlocked</span></span>
+            <span class="button-arrow" aria-hidden="true">›</span>
+          </button>
+          <button class="game-button settings" id="settingsButton" type="button">
+            <span class="button-icon" aria-hidden="true">⚙</span>
+            <span class="button-copy"><span class="button-title">SETTINGS</span></span>
+            <span class="button-arrow" aria-hidden="true">›</span>
+          </button>
+        </nav>
+        <p class="small-print">Every letter gets you one step closer ✨</p>
+      </section>
+    </main>
+
+    <footer class="bottom-note" aria-label="Game features">
+      <span>✏️ Learn at your pace</span>
+    </footer>
+  </div>
+
+  <div class="overlay" id="overlay" role="presentation" aria-hidden="true">
+    <section class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogIntro" tabindex="-1">
+      <button class="close-button" id="closeDialog" type="button" aria-label="Close">×</button>
+      <div id="dialogContent"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const overlay = document.getElementById('overlay');
+      const dialog = document.getElementById('dialog');
+      const dialogContent = document.getElementById('dialogContent');
+      const closeButton = document.getElementById('closeDialog');
+      const toast = document.getElementById('toast');
+      let lastFocused = null;
+      let toastTimer;
+
+      const readPreference = (key, fallback) => {
+        try {
+          const stored = localStorage.getItem(key);
+          return stored === null ? fallback : stored === 'true';
+        } catch (_) { return fallback; }
+      };
+      const writePreference = (key, value) => {
+        try { localStorage.setItem(key, String(value)); } catch (_) { /* Storage may be disabled. */ }
+      };
+      let soundOn = readPreference('noteroom-sound', true);
+      let motionOn = readPreference('noteroom-motion', true);
+
+      if (!motionOn || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.body.classList.add('no-motion');
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('show'), 3200);
+      }
+
+      function openDialog(content) {
+        lastFocused = document.activeElement;
+        dialogContent.innerHTML = content;
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        window.setTimeout(() => closeButton.focus(), 20);
+      }
+
+      function closeDialog() {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+      }
+
+      const heading = (kicker, title, intro) => `
+        <p class="dialog-kicker">${kicker}</p>
+        <h2 id="dialogTitle">${title}</h2>
+        <p class="dialog-intro" id="dialogIntro">${intro}</p>`;
+
+function showPlayMenu() {
+  openDialog(`${heading('Pick a path', 'Where shall we begin?', 'Choose a small practice session or visit the classroom you are building.')}
+    <div class="choice-grid">
+      <button class="choice-card" type="button" data-route="letters">
+        <span class="choice-emoji" aria-hidden="true">✏️</span>
+        <span>
+          <strong>Letter Games</strong>
+          <small>Trace one letter at a time: A, B, C, and more.</small>
+        </span>
+        <span class="choice-arrow" aria-hidden="true">›</span>
+      </button>
+
+      <button class="choice-card" type="button" data-route="room">
+        <span class="choice-emoji" aria-hidden="true">🪴</span>
+        <span>
+          <strong>My Classroom</strong>
+          <small>Spend earned coins on furniture and decorations.</small>
+        </span>
+        <span class="choice-arrow" aria-hidden="true">›</span>
+      </button>
+    </div>
+    <p class="status-note">Prototype preview: these destinations are menu previews for now. The activities and room shop will be connected as the game is developed.</p>`);
+
+  document.querySelector('[data-route="letters"]')
+    ?.addEventListener('click', () => {
+      window.location.href = 'Activity_page.html';
+    });
+}
+
+      function showAchievements() {
+        openDialog(`${heading('Little wins add up', 'Your achievement shelf', 'Every practice session is progress. These are example badges for the planned game.')}
+          <span class="demo-label">Sample achievements · not saved yet</span>
+          <div class="achievement-grid">
+            <div class="achievement"><span class="achievement-icon" aria-hidden="true">🌱</span><strong>First Steps</strong><small>Finish your first letter activity</small></div>
+            <div class="achievement"><span class="achievement-icon" aria-hidden="true">🪙</span><strong>Coin Collector</strong><small>Earn your first 50 coins</small></div>
+            <div class="achievement"><span class="achievement-icon" aria-hidden="true">🐲</span><strong>Boss Beginner</strong><small>Complete your first boss challenge</small></div>
+          </div>
+          <p class="status-note">Achievement tracking will connect to each student's profile once profiles and game progress are implemented.</p>`);
+      }
+
+      function showSettings() {
+        openDialog(`${heading('Your game, your way', 'Settings', 'Choose comfortable options. Your preferences are saved on this device when browser storage is available.')}
+          <div class="setting-row"><span class="setting-copy"><strong>Sound effects</strong><small>Allow button and game sounds when added</small></span><button class="switch" id="soundSwitch" type="button" role="switch" aria-checked="${soundOn}" aria-label="Toggle sound effects"></button></div>
+          <div class="setting-row"><span class="setting-copy"><strong>Motion effects</strong><small>Reduce floating and moving animations</small></span><button class="switch" id="motionSwitch" type="button" role="switch" aria-checked="${motionOn}" aria-label="Toggle motion effects"></button></div>
+          <p class="status-note">Sound is only a preference in this front-page prototype; no game audio is connected yet.</p>`);
+        document.getElementById('soundSwitch').addEventListener('click', () => {
+          soundOn = !soundOn;
+          writePreference('noteroom-sound', soundOn);
+          document.getElementById('soundSwitch').setAttribute('aria-checked', String(soundOn));
+          showToast(soundOn ? 'Sound preference turned on.' : 'Sound preference turned off.');
+        });
+        document.getElementById('motionSwitch').addEventListener('click', () => {
+          motionOn = !motionOn;
+          writePreference('noteroom-motion', motionOn);
+          document.body.classList.toggle('no-motion', !motionOn || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+          document.getElementById('motionSwitch').setAttribute('aria-checked', String(motionOn));
+          showToast(motionOn ? 'Motion effects turned on.' : 'Reduced motion turned on.');
+        });
+      }
+
+      function showLogin() {
+        openDialog(`${heading('Welcome back, learner', 'Log in to Noteroom', 'Account sign-in is planned for student profiles and teacher progress reports.')}
+          <span class="demo-label">Front-page preview only</span>
+          <form class="login-form" id="loginForm">
+            <label><span class="field-label">I am logging in as</span><select id="accountType" name="accountType"><option value="student">Student</option><option value="teacher">Teacher</option></select></label>
+            <label><span class="field-label">Student ID or email</span><input name="account" autocomplete="username" placeholder="Enter your ID or email" /></label>
+            <label><span class="field-label">Password</span><input name="password" type="password" autocomplete="current-password" placeholder="Not connected in this preview" /></label>
+            <button class="primary-dialog-button" type="submit">Continue</button>
+            <p class="form-note">No credentials are sent or saved. Please do not enter a real password in this demo; authentication has not been connected yet.</p>
+          </form>`);
+        document.getElementById('loginForm').addEventListener('submit', event => {
+          event.preventDefault();
+          showToast('Demo only: student and teacher authentication has not been connected yet.');
+        });
+      }
+
+      document.getElementById('playButton').addEventListener('click', showPlayMenu);
+      document.getElementById('achievementsButton').addEventListener('click', showAchievements);
+      document.getElementById('settingsButton').addEventListener('click', showSettings);
+      document.getElementById('loginButton').addEventListener('click', showLogin);
+      closeButton.addEventListener('click', closeDialog);
+      overlay.addEventListener('click', event => { if (event.target === overlay) closeDialog(); });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && overlay.classList.contains('open')) closeDialog();
+      });
+      dialogContent.addEventListener('click', event => {
+        const routeButton = event.target.closest('[data-route]');
+        if (!routeButton) return;
+        const route = routeButton.dataset.route;
+        const messages = {
+          letters: 'Letter Practice is planned next: guided tracing, writing-boundary feedback, and adjustable difficulty.',
+          boss: 'Word Boss Battle is planned next: handwriting performance will determine how much damage each written word deals.',
+          room: 'My Classroom is planned next: coins will be used to unlock classroom furniture and decorations.'
+        };
+        closeDialog();
+        showToast(messages[route] || 'This feature is planned for a later build.');
+      });
+    })();
+  </script>
+</body>
+</html>

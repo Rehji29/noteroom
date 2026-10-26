@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Noteroom – Choose Your Activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky1:#8fd0f5;--sky2:#d6efff;--wall:#f2c27d;--wall2:#e0a25a;--floor:#f6dcaa;
+  --board:#2f5d50;--frame:#b9783a;--chalk:#fffdf2;--ink:#3a2310;
+  --panel:#fffaf0;--pill:#1f6f96;--pillt:#fff;
+  --amber:#f5b21c;--amber2:#d98a0a;--blue:#2f86e8;--blue2:#1b5fb8;--violet:#7a4be0;--violet2:#5428b5;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky1:#1d3a5c;--sky2:#2b5380;--wall:#6b4a2c;--wall2:#523720;--floor:#7a5a38;
+  --board:#1f4339;--frame:#8a5a2c;--panel:#2b2433;--ink:#f4e8d6;--pill:#14465f;
+}}
+:root[data-theme="dark"]{--sky1:#1d3a5c;--sky2:#2b5380;--wall:#6b4a2c;--wall2:#523720;--floor:#7a5a38;--board:#1f4339;--frame:#8a5a2c;--panel:#2b2433;--ink:#f4e8d6;--pill:#14465f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;color:var(--ink);
+  background:linear-gradient(var(--sky1) 0,var(--sky2) 110px,var(--wall) 110px,var(--wall2) 100%);}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--sky1);z-index:10}
+header{display:flex;align-items:center;gap:12px;padding:14px 22px;flex-wrap:wrap}
+.logo{font-size:38px;font-weight:700;color:#ffc61a;-webkit-text-stroke:2px #fff;paint-order:stroke fill;text-shadow:0 3px 0 #1f4f8a,0 5px 0 #1f4f8a;letter-spacing:.5px;margin-right:auto}
+.profile{display:flex;align-items:center;gap:10px;background:var(--pill);border:3px solid #fff;border-radius:40px;padding:5px 22px 5px 5px;color:var(--pillt)}
+.avatar{width:46px;height:46px;border-radius:50%;background:#ffe2c2;display:grid;place-items:center;font-size:28px;border:3px solid #fff}
+.profile b{font-size:18px;display:block;line-height:1.1}
+.profile small{font-size:14px}
+.xp{height:8px;width:150px;background:#0d3a52;border-radius:6px;margin-top:4px;overflow:hidden}
+.xp i{display:block;height:100%;width:45%;background:var(--amber);border-radius:6px}
+.coins{display:flex;align-items:center;gap:10px;background:var(--pill);border:3px solid #fff;border-radius:40px;padding:4px 30px 4px 4px;color:#fff;font-weight:600;font-size:22px;margin-left:16px}
+.coin{width:40px;height:40px;border-radius:50%;background:radial-gradient(#ffe066,#f5a900);border:3px solid #c98200;display:grid;place-items:center;font-weight:700;color:#a86500}
+.ibtn{width:48px;height:48px;border-radius:14px;border:3px solid #fff;background:var(--pill);color:#fff;font-size:22px;cursor:pointer}
+.ibtn:focus-visible,.start:focus-visible,.rewards:focus-visible{outline:4px solid #fff;outline-offset:3px;box-shadow:0 0 0 7px var(--violet)}
+main{max-width:1060px;margin:10px auto 0;padding:0 18px 130px;position:relative}
+.frame{background:var(--frame);border-radius:26px;padding:14px;box-shadow:0 10px 0 rgba(0,0,0,.18)}
+.board{background:var(--board);border-radius:16px;padding:26px 22px 28px;box-shadow:inset 0 0 40px rgba(0,0,0,.35);color:var(--chalk);text-align:center}
+.board h1{margin:0;font-size:clamp(28px,5vw,48px);font-weight:600;letter-spacing:.5px}
+.board h1 span{color:#ffc61a;font-size:.6em;vertical-align:middle;margin:0 14px}
+.board p{margin:4px 0 24px;font-size:20px;opacity:.95}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.card{position:relative;border-radius:26px;padding:56px 18px 20px;color:#3a2310;display:flex;flex-direction:column;align-items:center;text-align:center;border:5px solid;transition:transform .15s}
+.card:hover{transform:translateY(-4px)}
+.tag{position:absolute;top:-24px;left:50%;transform:translateX(-50%);color:#fff;font-weight:700;font-size:34px;padding:2px 30px;border-radius:22px 22px 14px 14px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.art{height:150px;display:grid;place-items:center;width:100%;position:relative}
+.card h2{margin:6px 0 2px;font-size:24px;font-weight:600}
+.card p{margin:0 0 16px;font-size:16px;color:#5b4630;min-height:2.6em;text-align:center}
+.start{margin-top:auto;width:78%;border:0;border-radius:30px;padding:12px;font:600 22px "Fredoka",sans-serif;color:#fff;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.start:active{transform:translateY(4px);box-shadow:none!important}
+.c1{background:#fff7e6;border-color:#f5b21c}.c1 .tag{background:#ee5a5a}.c1 .start{background:var(--amber);box-shadow:0 5px 0 var(--amber2)}
+.c2{background:#eaf6ff;border-color:#7cc4f2}.c2 .tag{background:var(--blue);font-size:30px}.c2 .start{background:var(--blue);box-shadow:0 5px 0 var(--blue2)}
+.c3{background:#efe6ff;border-color:#a48af0}.c3 .tag{background:none;box-shadow:none;top:-34px;font-size:34px;padding:0}.c3 .start{background:var(--violet);box-shadow:0 5px 0 var(--violet2)}
+.trace{font-size:120px;font-weight:600;color:transparent;-webkit-text-stroke:3px #b9b3a6;line-height:1}
+.trace.dash{-webkit-text-stroke:3px #a8a39a;text-decoration:none}
+.pencil{position:absolute;right:14%;top:8px;font-size:46px;transform:rotate(10deg)}
+.lines{background:#fff;border-radius:10px;width:100%;padding:8px 0;position:relative;border-top:3px solid #7cc4f2}
+.lines::after{content:"";position:absolute;left:0;right:0;bottom:14px;border-bottom:3px dashed #ef6b6b}
+.lines .trace{font-size:76px;letter-spacing:6px;-webkit-text-stroke:2.5px #b9b3a6}
+.boss{font-size:96px;filter:drop-shadow(0 6px 0 rgba(60,20,120,.25))}
+.crown{position:absolute;top:-6px;font-size:34px}
+.hp{width:88%;height:20px;border-radius:12px;background:#2a3a5c;border:3px solid #1b2744;overflow:hidden;margin-top:-6px}
+.hp i{display:block;height:100%;width:68%;background:linear-gradient(#ff8a9a,#e8405a)}
+.goal{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(860px,calc(100% - 32px));background:var(--panel);border-radius:40px;padding:10px 14px 10px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:5}
+.goal .tro{font-size:34px}
+.goal b{display:block;font-size:17px}.goal small{font-size:15px;opacity:.8}
+.bar{flex:1;height:16px;border-radius:10px;background:#d9d4cc;overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(#ffd54a,#f5a900);transition:width .4s}
+.count{font-weight:600}
+.rewards{border:3px solid var(--violet);background:transparent;color:var(--violet);border-radius:26px;padding:8px 18px;font:600 17px "Fredoka",sans-serif;cursor:pointer;display:flex;gap:8px;align-items:center}
+.kid{position:absolute;left:-6px;bottom:-96px;z-index:3;pointer-events:none;display:none}
+.say{position:absolute;left:10px;top:-86px;background:#fff;color:#3a2310;border-radius:50%;padding:20px 22px;font-weight:600;font-size:22px;line-height:1.1;transform:rotate(-8deg);box-shadow:0 4px 0 rgba(0,0,0,.12);text-align:center}
+.kidface{font-size:130px;line-height:1}
+@media(min-width:1180px){.kid{display:block}}
+.toast{position:fixed;top:calc(90px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-20px);background:var(--violet);color:#fff;padding:12px 22px;border-radius:30px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:20}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:860px){
+  .cards{grid-template-columns:1fr;gap:44px}
+  .card{padding-top:50px}
+  .coins{margin-left:0}
+  .goal small{display:none}
+  .rewards span{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Noteroom ✏️</div>
+  <div class="profile"><div class="avatar">🧒</div><div><b>Student</b><small>Level 2</small><div class="xp"><i></i></div></div></div>
+  <div class="coins"><span class="coin">$</span><span id="coins">120</span></div>
+  <button class="ibtn" aria-label="Settings">⚙️</button>
+  <a href="saket.html"><button class="ibtn" aria-label="Log out">🚪</button></a>
+</header>
+
+<main>
+  <div class="kid" aria-hidden="true"><div class="say">You can<br>do it!</div><div class="kidface">🧒</div></div>
+  <div class="frame"><section class="board">
+    <h1><span>★</span>Choose Your Activity<span>★</span></h1>
+    <p>Practice, improve, and earn rewards!</p>
+    <div class="cards">
+      <article class="card c1">
+        <div class="tag">A</div>
+        <div class="art"><span class="trace dash">A</span><span class="pencil">✏️</span></div>
+        <h2>Letter Practice</h2><p>Trace and write letters.</p>
+        <a href="Trace_A.html" class="start" style="text-decoration: none;">Start</a>
+      </article>
+      <article class="card c2">
+        <div class="tag">CAT</div>
+        <div class="art"><div class="lines"><span class="trace dash">CAT</span></div><span class="pencil" style="top:-4px;right:2%">🖊️</span></div>
+        <h2>Word Practice</h2><p>Trace and copy words.</p>
+        <a href="Trace_Word.html" class="start" style="text-decoration: none;">Start</a>
+      </article>
+      <article class="card c3">
+        <div class="tag"><span class="crown">👑</span></div>
+        <div class="art" style="flex-direction:column;margin-top:-10px"><span class="boss">👾</span></div>
+        <div class="hp" aria-label="Boss health"><i></i></div>
+        <h2 style="margin-top:12px">Boss Battle</h2><p>Write the word and defeat the boss!</p>
+              <a href="Boss.html" class="start" style="text-decoration: none;">Start</a>
+      </article>
+    </div>
+  </section></div>
+</main>
+
+<div class="goal">
+  <span class="tro">🏆</span>
+  <div><b>Today’s Goal</b><small>Complete 1 activity</small></div>
+  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"><i id="fill"></i></div>
+  <span class="count" id="count">0/1</span>
+  <button class="rewards">🎁 <span>Rewards</span></button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var done=0,coins=120,toast=document.getElementById("toast");
+function show(t){toast.textContent=t;toast.classList.add("on");clearTimeout(show.h);show.h=setTimeout(function(){toast.classList.remove("on")},2200)}
+document.querySelectorAll(".start").forEach(function(b){
+  b.addEventListener("click",function(){
+    show("Starting "+b.dataset.act+"…");
+    if(done<1){done=1;coins+=20;
+      document.getElementById("fill").style.width="100%";
+      document.getElementById("count").textContent="1/1";
+      document.getElementById("coins").textContent=coins;
+      document.querySelector(".bar").setAttribute("aria-valuenow","1");
+      setTimeout(function(){show("Goal complete! +20 coins")},2300);
+    }
+  });
+});
+document.querySelector(".rewards").addEventListener("click",function(){show("Rewards are coming soon")});
+</script>
+</body>
+</html>

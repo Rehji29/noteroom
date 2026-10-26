@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+        <title>Noteroom – Trace the Letter</title>
+        <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet" />
+        <style>
+            :root {
+                --sky: #8fcdf8;
+                --blue: #1f6fd6;
+                --navy: #0d3f8f;
+                --green: #1fa653;
+                --wood: #e8b27a;
+                --cream: #fff7e6;
+                --gold: #f7c948;
+                color-scheme: light;
+            }
+            * {
+                box-sizing: border-box;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            body,
+            html {
+                margin: 0;
+                height: 100%;
+                overflow: hidden;
+                background: var(--sky);
+                font-family: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+                color: var(--navy);
+            }
+            #stage {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 1536px;
+                height: 1024px;
+                transform-origin: center;
+                overflow: hidden;
+                background: linear-gradient(
+                    #8fcdf8 0,
+                    #c9e8fb 380px,
+                    #f3dcb8 381px,
+                    #f3dcb8 760px,
+                    #e8b27a 761px,
+                    #d79a5e 1024px
+                );
+            }
+            .abs {
+                position: absolute;
+            }
+            .shelf {
+                left: 0;
+                top: 120px;
+                width: 1536px;
+                height: 650px;
+                background: repeating-linear-gradient(90deg, transparent 0 40px, rgba(255, 255, 255, 0.18) 40px 44px);
+            }
+            .btn {
+                position: absolute;
+                border: 0;
+                border-radius: 50%;
+                background: var(--blue);
+                color: #fff;
+                font: 800 40px/1 inherit;
+                cursor: pointer;
+                box-shadow:
+                    0 5px 0 #0d3f8f,
+                    0 0 0 4px #fff;
+            }
+            .btn:active {
+                transform: translateY(3px);
+            }
+            .logo {
+                left: 160px;
+                top: 14px;
+                font: 800 74px/1 "Baloo 2";
+                color: var(--gold);
+                -webkit-text-stroke: 7px #1f4fa8;
+                paint-order: stroke fill;
+                letter-spacing: -1px;
+            }
+            .pill {
+                border-radius: 50px;
+                background: #2a8fd0;
+                box-shadow: 0 0 0 4px #fff4;
+            }
+            .panel {
+                background: var(--cream);
+                border-radius: 34px;
+                box-shadow:
+                    0 0 0 5px #f6e2bd,
+                    0 10px 0 #0002;
+            }
+            .panel h3 {
+                margin: 0;
+                font-size: 30px;
+                font-weight: 800;
+            }
+            .frame {
+                left: 358px;
+                top: 150px;
+                width: 955px;
+                height: 615px;
+                border-radius: 46px;
+                background: var(--cream);
+                border: 22px solid #d99a55;
+                box-shadow: 0 10px 0 #0003;
+            }
+            .banner {
+                left: 552px;
+                top: 143px;
+                width: 540px;
+                height: 78px;
+                border-radius: 40px;
+                background: linear-gradient(#2f80e8, #1f64c8);
+                color: #fff;
+                font: 800 40px/78px "Baloo 2";
+                text-align: center;
+                box-shadow: 0 0 0 5px #fff;
+            }
+            .big {
+                position: absolute;
+                bottom: 782px;
+                height: 88px;
+                border-radius: 44px;
+                border: 0;
+                color: #fff;
+                font: 800 36px "Baloo 2";
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                box-shadow:
+                    0 0 0 5px #fff,
+                    0 8px 0 #0003;
+            }
+            .big:active {
+                transform: translateY(4px);
+            }
+            #try {
+                left: 418px;
+                width: 310px;
+                background: linear-gradient(#2f80e8, #1f64c8);
+                bottom: auto;
+                top: 780px;
+            }
+            #check {
+                left: 860px;
+                width: 322px;
+                background: linear-gradient(#2dbd63, #1a9a4a);
+                bottom: auto;
+                top: 780px;
+            }
+            .diff {
+                display: flex;
+                gap: 2px;
+                background: #e9e2d2;
+                border-radius: 20px;
+                padding: 4px;
+            }
+            .diff button {
+                flex: 1;
+                border: 0;
+                border-radius: 16px;
+                padding: 8px 0;
+                font: 700 20px "Baloo 2";
+                background: #ddd;
+                color: #999;
+                cursor: pointer;
+            }
+            .diff button.on {
+                background: var(--blue);
+                color: #fff;
+            }
+            .diff button.lock {
+                cursor: not-allowed;
+            }
+            .bubble {
+                background: #fff;
+                border-radius: 50%/60%;
+                padding: 16px 22px;
+                text-align: center;
+                font: 800 27px/1.1 "Baloo 2";
+                box-shadow: 0 4px 0 #0002;
+                color: #1a5fc4;
+            }
+            .goal {
+                left: 150px;
+                top: 900px;
+                width: 795px;
+                height: 88px;
+                border-radius: 44px;
+                background: var(--cream);
+                box-shadow: 0 6px 0 #0003;
+            }
+            .bar {
+                height: 20px;
+                border-radius: 10px;
+                background: #d8d8d8;
+                overflow: hidden;
+            }
+            .bar i {
+                display: block;
+                height: 100%;
+                background: var(--gold);
+                transition: width 0.5s;
+            }
+            #board {
+                touch-action: none;
+                cursor: crosshair;
+            }
+            @keyframes pop {
+                0% {
+                    transform: scale(0.2);
+                    opacity: 0;
+                }
+                60% {
+                    transform: scale(1.25);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+            @keyframes fly {
+                to {
+                    transform: translate(var(--x), var(--y)) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+            .star {
+                position: absolute;
+                font-size: 44px;
+                animation: fly 1.1s ease-out forwards;
+                pointer-events: none;
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .star {
+                    display: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="stage">
+            <div class="abs shelf"></div>
+            <div
+                class="abs"
+                style="left: 0; top: 0; width: 1536px; height: 122px; background: linear-gradient(#7cc4f6, #a8d9fa)"
+            ></div>
+            <a href="Activity_page.html" class="btn" id="back" style="left: 34px; top: 26px; width: 72px; height: 72px" aria-label="Back"><img src="Back.svg"  style="width: 72px; height: 72px"></a>
+            <div class="abs logo">Noteroom</div>
+            <div class="abs pill" style="left: 538px; top: 16px; width: 390px; height: 90px">
+                <div
+                    class="abs"
+                    style="
+                        left: 10px;
+                        top: 7px;
+                        width: 76px;
+                        height: 76px;
+                        border-radius: 50%;
+                        background: #ffe3c2;
+                        border: 4px solid #fff;
+                        font-size: 52px;
+                        text-align: center;
+                        line-height: 68px;
+                    "
+                >
+                    🧒
+                </div>
+                <div class="abs" style="left: 106px; top: 6px; color: #fff; font: 700 26px/1 &quot;Baloo 2&quot;">
+                    Student
+                </div>
+                <div
+                    class="abs"
+                    style="left: 106px; top: 36px; color: #fff; font: 600 20px/1 &quot;Baloo 2&quot;"
+                    id="lvl"
+                >
+                    Level 2
+                </div>
+                <div class="abs bar" style="left: 106px; top: 62px; width: 250px; height: 14px; background: #1b5b8f">
+                    <i id="xp" style="width: 33%"></i>
+                </div>
+            </div>
+            <div class="abs pill" style="left: 1070px; top: 26px; width: 208px; height: 62px; background: #1c4b7d">
+                <div
+                    class="abs"
+                    style="
+                        left: 0;
+                        top: -4px;
+                        width: 66px;
+                        height: 66px;
+                        border-radius: 50%;
+                        background: var(--gold);
+                        border: 4px solid #e6a512;
+                        font-size: 34px;
+                        text-align: center;
+                        line-height: 56px;
+                        color: #fff;
+                    "
+                >
+                    ★
+                </div>
+                <div
+                    class="abs"
+                    id="coins"
+                    style="left: 100px; top: 6px; color: #fff; font: 800 40px &quot;Baloo 2&quot;"
+                >
+                    120
+                </div>
+            </div>
+            <button class="btn" id="gear" style="left: 1434px; top: 20px; width: 72px; height: 72px; font-size: 36px" aria-label="Sound on/off">
+                ⚙
+            </button>
+            <div class="abs panel" style="left: 58px; top: 184px; width: 290px; height: 585px; padding: 20px 18px">
+                <h3>⭐ Letter Practice</h3>
+                <p style="margin: 10px 0 0; text-align: center; font-size: 21px; line-height: 1.15; color: #4a6a96">
+                    Trace the letter<br />and say its name.
+                </p>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 18px">
+                    <button
+                        class="btn"
+                        id="prev"
+                        style="
+                            position: static;
+                            width: 46px;
+                            height: 46px;
+                            font-size: 30px;
+                            background: #fff;
+                            color: var(--blue);
+                            box-shadow: 0 3px 0 #0002;
+                        "
+                    >
+                        ‹
+                    </button>
+                    <div
+                        id="miniL"
+                        style="
+                            width: 116px;
+                            height: 110px;
+                            border-radius: 22px;
+                            background: #e6f3ff;
+                            border: 4px solid #b9dcf7;
+                            text-align: center;
+                            font: 800 100px/104px &quot;Baloo 2&quot;;
+                        "
+                    ></div>
+                    <button
+                        class="btn"
+                        id="next"
+                        style="
+                            position: static;
+                            width: 46px;
+                            height: 46px;
+                            font-size: 30px;
+                            background: #fff;
+                            color: var(--blue);
+                            box-shadow: 0 3px 0 #0002;
+                        "
+                    >
+                        ›
+                    </button>
+                </div>
+                <div style="margin-top: 30px; font: 800 24px &quot;Baloo 2&quot;">Difficulty</div>
+                <div class="diff" id="diff">
+                    <button data-d="easy" class="on">Easy</button><button data-d="medium" class="lock">🔒 Medium</button
+                    ><button data-d="hard" class="lock">🔒 Hard</button>
+                </div>
+                <div style="display: flex; align-items: center; margin-top: 36px; gap: 10px">
+                    <div style="font-size: 92px; transform: rotate(18deg)">✏️</div>
+                    <div class="bubble" id="coach" style="font-size: 24px">You can do it!</div>
+                </div>
+            </div>
+            <div class="abs frame">
+                <svg
+                    id="board"
+                    viewBox="0 0 920 500"
+                    width="911"
+                    height="571"
+                    style="position: absolute; left: 0; top: 0; margin: -3px 0 0 -3px; width: 100%; height: 100%"
+                    preserveAspectRatio="xMidYMid meet"
+                >
+                    <line x1="20" x2="900" y1="70" y2="70" stroke="#a9d8f5" stroke-width="3" stroke-dasharray="22 14" />
+                    <line x1="20" x2="900" y1="250" y2="250" stroke="#f3a6ad" stroke-width="3" />
+                    <line x1="20" x2="900" y1="430" y2="430" stroke="#ccc" stroke-width="3" />
+                    <g
+                        id="guide"
+                        fill="none"
+                        stroke="#9aa6b8"
+                        stroke-width="16"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-dasharray="1 26"
+                    ></g>
+                    <g
+                        id="ink"
+                        fill="none"
+                        stroke="#2a7de1"
+                        stroke-width="22"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        opacity=".85"
+                    ></g>
+                    <g id="mk">
+                        <circle r="22" fill="#1fa653" stroke="#fff" stroke-width="4" />
+                        <path
+                            d="M0 -9V9M-8 1L0 9L8 1"
+                            stroke="#fff"
+                            stroke-width="5"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </g>
+                    <g id="fx"></g>
+                </svg>
+            </div>
+            <div class="abs banner">⭐ &nbsp;Trace the letter<span id="tl">A</span>&nbsp; ⭐</div>
+            <button
+                class="btn"
+                id="spk"
+                style="left: 1344px; top: 154px; width: 120px; height: 120px; font-size: 56px; background: #2f80e8"
+                aria-label="Say the letter name"
+            >
+                🔊
+            </button>
+            <div
+                class="abs panel"
+                style="left: 1313px; top: 224px; width: 170px; height: 460px; border-radius: 30px; z-index: 0"
+            ></div>
+            <div
+                class="abs"
+                style="
+                    left: 1331px;
+                    top: 300px;
+                    width: 134px;
+                    height: 134px;
+                    border-radius: 20px;
+                    background: #fff;
+                    text-align: center;
+                    font: 800 130px/140px &quot;Baloo 2&quot;;
+                "
+                id="bigL"
+            ></div>
+            <div
+                class="abs"
+                style="left: 1313px; top: 436px; width: 170px; text-align: center; font: 800 24px &quot;Baloo 2&quot;"
+                id="nameL"
+            >
+                Letter A
+            </div>
+            <div
+                class="abs bubble"
+                id="say"
+                style="left: 1326px; top: 520px; width: 142px; height: 110px; padding-top: 26px; font-size: 34px"
+            >
+                Great<br />job!
+            </div>
+            <button class="big" id="try"><span style="font-size: 48px">↻</span>Try Again</button
+            ><button class="big" id="check">
+                <span
+                    style="
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        background: #fff;
+                        color: var(--green);
+                        font-size: 34px;
+                        line-height: 50px;
+                    "
+                    >✓</span
+                ><span id="chk">Check</span>
+            </button>
+            <div class="abs goal">
+                <div class="abs" style="left: 26px; top: 12px; font-size: 56px">🏆</div>
+                <div class="abs" style="left: 100px; top: 12px; font: 800 24px &quot;Baloo 2&quot;">Today’s Goal</div>
+                <div class="abs" style="left: 100px; top: 42px; font: 600 20px &quot;Baloo 2&quot;; color: #667">
+                    Trace 3 letters
+                </div>
+                <div class="abs bar" style="left: 275px; top: 34px; width: 430px">
+                    <i id="gbar" style="width: 0"></i>
+                </div>
+                <div class="abs" id="gtxt" style="left: 732px; top: 26px; font: 800 26px &quot;Baloo 2&quot;">0/3</div>
+            </div>
+            <div class="abs" style="left: 10px; top: 800px; font-size: 150px">📚</div>
+            <div class="abs" style="left: 1390px; top: 780px; font-size: 150px">🪴</div>
+        </div>
+        <script>
+            const $ = (s) => document.querySelector(s),
+                NS = "http://www.w3.org/2000/svg";
+            const arc = (cx, cy, rx, ry, a0, a1, n = 16) => {
+                const p = [];
+                for (let i = 0; i <= n; i++) {
+                    const a = ((a0 + ((a1 - a0) * i) / n) * Math.PI) / 180;
+                    p.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]);
+                }
+                return p;
+            };
+            const L = {
+                A: [
+                    [
+                        [150, 0],
+                        [20, 360],
+                    ],
+                    [
+                        [150, 0],
+                        [280, 360],
+                    ],
+                    [
+                        [60, 235],
+                        [240, 235],
+                    ],
+                ],
+                B: [
+                    [
+                        [40, 0],
+                        [40, 360],
+                    ],
+                    [[40, 0], [150, 0], ...arc(150, 90, 85, 90, -90, 90), [40, 180]],
+                    [[40, 180], [160, 180], ...arc(160, 270, 100, 90, -90, 90), [40, 360]],
+                ],
+                C: [arc(160, 180, 130, 180, -35, -325, 30)],
+                D: [
+                    [
+                        [40, 0],
+                        [40, 360],
+                    ],
+                    [[40, 0], [130, 0], ...arc(130, 180, 150, 180, -90, 90), [40, 360]],
+                ],
+                E: [
+                    [
+                        [240, 0],
+                        [50, 0],
+                        [50, 360],
+                        [240, 360],
+                    ],
+                    [
+                        [50, 180],
+                        [210, 180],
+                    ],
+                ],
+            };
+            const keys = Object.keys(L),
+                OX = 310,
+                OY = 70,
+                TOL = { easy: 30, medium: 20, hard: 13 },
+                NEED = 0.85;
+            let idx = 0,
+                diff = "easy",
+                coins = 120,
+                xp = 33,
+                goal = 0,
+                total = 0,
+                muted = false,
+                done = new Set(),
+                won = false,
+                drawing = false,
+                cur = null,
+                ink = [],
+                samples = [],
+                cov = [];
+            const sample = () => {
+                samples = [];
+                L[keys[idx]].forEach((s, si) => {
+                    for (let i = 1; i < s.length; i++) {
+                        const [a, b] = [s[i - 1], s[i]],
+                            d = Math.hypot(b[0] - a[0], b[1] - a[1]),
+                            n = Math.max(1, Math.round(d / 9));
+                        for (let k = i == 1 ? 0 : 1; k <= n; k++)
+                            samples.push({
+                                x: OX + a[0] + ((b[0] - a[0]) * k) / n,
+                                y: OY + a[1] + ((b[1] - a[1]) * k) / n,
+                                s: si,
+                            });
+                    }
+                });
+                cov = samples.map(() => false);
+            };
+            const say = (t) => {
+                if (muted || !window.speechSynthesis) return;
+                try {
+                    speechSynthesis.cancel();
+                    speechSynthesis.speak(new SpeechSynthesisUtterance(t));
+                } catch (e) {}
+            };
+            const coach = (t) => {
+                $("#coach").textContent = t;
+            };
+            function load() {
+                const k = keys[idx];
+                won = false;
+                ink = [];
+                cur = null;
+                $("#ink").innerHTML = "";
+                $("#fx").innerHTML = "";
+                const d = L[k].map((s) => "M" + s.map((p) => OX + p[0] + " " + (OY + p[1])).join("L")).join(" ");
+                const g = $("#guide");
+                g.innerHTML = '<path d="' + d + '"/>';
+                g.style.opacity = diff == "hard" ? 0.25 : 1;
+                ["#miniL", "#bigL"].forEach((s) => ($(s).textContent = k));
+                $("#nameL").textContent = "Letter " + k;
+                $("#tl").textContent = k;
+                $("#chk").textContent = "Check";
+                $("#say").style.opacity = 0;
+                coach("You can do it!");
+                sample();
+                marker();
+            }
+            function marker() {
+                const n = samples.length;
+                let target = null;
+                for (let s = 0; s < L[keys[idx]].length; s++) {
+                    const m = samples.filter((p) => p.s == s),
+                        c = m.filter((p, i) => cov[samples.indexOf(p)]).length;
+                    if (c < m.length * 0.8) {
+                        target = m[0];
+                        break;
+                    }
+                }
+                const mk = $("#mk");
+                if (target && !won) {
+                    mk.style.display = "";
+                    mk.setAttribute("transform", `translate(${target.x} ${target.y})`);
+                } else mk.style.display = "none";
+            }
+            const pt = (e) => {
+                const s = $("#board"),
+                    p = s.createSVGPoint();
+                p.x = e.clientX;
+                p.y = e.clientY;
+                return p.matrixTransform(s.getScreenCTM().inverse());
+            };
+            function add(p) {
+                const t = TOL[diff];
+                const last = cur.pts[cur.pts.length - 1];
+                const seg = [p];
+                if (last) {
+                    const d = Math.hypot(p.x - last.x, p.y - last.y),
+                        n = Math.floor(d / 6);
+                    for (let i = 1; i <= n; i++)
+                        seg.unshift({
+                            x: last.x + ((p.x - last.x) * i) / (n + 1),
+                            y: last.y + ((p.y - last.y) * i) / (n + 1),
+                        });
+                    seg.sort((a, b) => Math.hypot(a.x - last.x, a.y - last.y) - Math.hypot(b.x - last.x, b.y - last.y));
+                }
+                seg.forEach((q) => {
+                    cur.pts.push(q);
+                    ink.push(q);
+                    samples.forEach((s, i) => {
+                        if (!cov[i] && Math.hypot(s.x - q.x, s.y - q.y) < t) cov[i] = true;
+                    });
+                });
+                cur.el.setAttribute("points", cur.pts.map((q) => q.x.toFixed(1) + "," + q.y.toFixed(1)).join(" "));
+            }
+            const bd = $("#board");
+            bd.addEventListener("pointerdown", (e) => {
+                if (won) return;
+                bd.setPointerCapture(e.pointerId);
+                drawing = true;
+                const el = document.createElementNS(NS, "polyline");
+                $("#ink").appendChild(el);
+                cur = { pts: [], el };
+                add(pt(e));
+            });
+            bd.addEventListener("pointermove", (e) => {
+                if (drawing) add(pt(e));
+            });
+            const up = () => {
+                if (!drawing) return;
+                drawing = false;
+                marker();
+            };
+            bd.addEventListener("pointerup", up);
+            bd.addEventListener("pointercancel", up);
+            function clearInk() {
+                ink = [];
+                $("#ink").innerHTML = "";
+                cov = samples.map(() => false);
+                marker();
+            }
+            $("#try").onclick = () => {
+                if (won) return;
+                clearInk();
+                coach("Try again!");
+                $("#say").style.opacity = 0;
+            };
+            $("#back").onclick = $("#try").onclick;
+            function burst() {
+                const fx = $("#stage");
+                for (let i = 0; i < 14; i++) {
+                    const s = document.createElement("div");
+                    s.className = "star";
+                    s.textContent = ["⭐", "✨", "🌟"][i % 3];
+                    s.style.left = "770px";
+                    s.style.top = "420px";
+                    s.style.setProperty("--x", Math.random() * 900 - 450 + "px");
+                    s.style.setProperty("--y", Math.random() * 600 - 350 + "px");
+                    fx.appendChild(s);
+                    setTimeout(() => s.remove(), 1200);
+                }
+            }
+            function unlock() {
+                const b = $("#diff").children;
+                if (goal >= 3 && b[1].classList.contains("lock")) {
+                    b[1].classList.remove("lock");
+                    b[1].textContent = "Medium";
+                }
+                if (total >= 6 && b[2].classList.contains("lock")) {
+                    b[2].classList.remove("lock");
+                    b[2].textContent = "Hard";
+                }
+            }
+            $("#check").onclick = () => {
+                if (won) {
+                    idx = (idx + 1) % keys.length;
+                    load();
+                    return;
+                }
+                if (ink.length < 5) {
+                    coach("Trace the dots first!");
+                    return;
+                }
+                const t = TOL[diff],
+                    c = cov.filter(Boolean).length / cov.length,
+                    on =
+                        ink.filter((q) => samples.some((s) => Math.hypot(s.x - q.x, s.y - q.y) < t * 1.8)).length /
+                        ink.length;
+                if (c >= NEED && on >= 0.7) {
+                    won = true;
+                    marker();
+                    const k = keys[idx];
+                    $("#say").style.opacity = 1;
+                    $("#say").style.animation = "pop .5s";
+                    coach("Awesome!");
+                    $("#chk").textContent = "Next letter";
+                    coins += 10;
+                    xp += 25;
+                    if (xp >= 100) {
+                        xp -= 100;
+                        $("#lvl").textContent = "Level " + (+$("#lvl").textContent.slice(6) + 1);
+                    }
+                    if (!done.has(k)) {
+                        done.add(k);
+                        goal = Math.min(3, goal + 1);
+                        total++;
+                    }
+                    $("#coins").textContent = coins;
+                    $("#xp").style.width = xp + "%";
+                    $("#gbar").style.width = (goal / 3) * 100 + "%";
+                    $("#gtxt").textContent = goal + "/3";
+                    unlock();
+                    burst();
+                    say(k);
+                } else {
+                    const miss = c < NEED;
+                    coach(miss ? "Almost! Cover the whole letter." : "Stay on the dots!");
+                    $("#say").style.opacity = 0;
+                }
+            };
+            $("#prev").onclick = () => {
+                idx = (idx + keys.length - 1) % keys.length;
+                load();
+            };
+            $("#next").onclick = () => {
+                idx = (idx + 1) % keys.length;
+                load();
+            };
+            $("#spk").onclick = () => {
+                const k = keys[idx];
+                muted = false;
+                say(k + ". Letter " + k);
+            };
+            $("#gear").onclick = () => {
+                muted = !muted;
+                $("#gear").textContent = muted ? "🔇" : "⚙";
+                coach(muted ? "Sound off" : "Sound on");
+            };
+            $("#diff").onclick = (e) => {
+                const b = e.target.closest("button");
+                if (!b) return;
+                if (b.classList.contains("lock")) {
+                    coach(b.dataset.d == "medium" ? "Trace 3 letters to unlock!" : "Trace 6 letters to unlock!");
+                    return;
+                }
+                [...$("#diff").children].forEach((x) => x.classList.remove("on"));
+                b.classList.add("on");
+                diff = b.dataset.d;
+                load();
+            };
+            function fit() {
+                const s = Math.min(innerWidth / 1536, innerHeight / 1024);
+                $("#stage").style.transform = `translate(-50%,-50%) scale(${s})`;
+            }
+            addEventListener("resize", fit);
+            fit();
+            $("#say").style.opacity = 0;
+            load();
+        </script>
+    </body>
+</html>
